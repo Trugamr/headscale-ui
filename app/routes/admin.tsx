@@ -1,36 +1,42 @@
-import { json } from '@remix-run/node'
-import { Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
-import { getNamespaces } from '~/models/namespace.server'
-
-export const loader = async () => {
-  const { namespaces } = await getNamespaces()
-
-  if (namespaces.length === 0) {
-    // TODO: Throw no namespaces found error and handle in boundary
-    throw new Error('Not implemented')
-  }
-
-  return json({ namespaces })
-}
+import type { NavLinkProps } from '@remix-run/react'
+import { Link, NavLink, Outlet } from '@remix-run/react'
+import classNames from 'classnames'
 
 export default function AdminRoute() {
-  const { namespaces } = useLoaderData<typeof loader>()
-  const [namespace] = namespaces
-
   return (
     <div>
       <div>
-        <header className="flex">
-          <Link to="/admin">
-            <h1>{namespace.name}</h1>
-          </Link>
-        </header>
-        <nav className="border">
-          <NavLink to="machines">Machines</NavLink>
-          <NavLink to="settings">Settings</NavLink>
+        <div>
+          <header className="flex p-4">
+            <Link to="/admin">
+              <h1>headscale</h1>
+            </Link>
+          </header>
+        </div>
+        <nav className="flex gap-x-2 border px-4">
+          <StyledNavLink to="namespaces">Namespaces</StyledNavLink>
+          <StyledNavLink to="machines">Machines</StyledNavLink>
+          <StyledNavLink to="settings">Settings</StyledNavLink>
         </nav>
       </div>
       <Outlet />
     </div>
+  )
+}
+
+// Components
+function StyledNavLink({ children, className, ...rest }: NavLinkProps) {
+  return (
+    <NavLink
+      className={props => {
+        const _className =
+          typeof className === 'function' ? className(props) : className
+
+        return classNames(props.isActive ? 'underline' : undefined, _className)
+      }}
+      {...rest}
+    >
+      {children}
+    </NavLink>
   )
 }

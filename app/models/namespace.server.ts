@@ -8,9 +8,18 @@ export async function getNamespaces() {
   return data
 }
 
+export async function createNamespace({ name }: CreateNamespaceOptions) {
+  const { data } = await client.post<Namespace>('/v1/namespace', { name })
+  return data
+}
+
 // Types
 export type Namespace = {
   id: string
   name: string
   createdAt: string
+}
+
+type CreateNamespaceOptions = {
+  name: string
 }
