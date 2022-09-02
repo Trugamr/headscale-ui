@@ -1,16 +1,12 @@
 import { client } from '~/utils/client.server'
 
 // Routes
-export async function getNamespaces() {
-  const { data } = await client.get<{ namespaces: Namespace[] }>(
-    '/v1/namespace',
-  )
-  return data
+export function getNamespaces() {
+  return client.get('v1/namespace').json<{ namespaces: Namespace[] }>()
 }
 
-export async function createNamespace({ name }: CreateNamespaceOptions) {
-  const { data } = await client.post<Namespace>('/v1/namespace', { name })
-  return data
+export function createNamespace({ name }: CreateNamespaceOptions) {
+  return client.post('v1/namespace', { json: { name } }).json<Namespace>()
 }
 
 // Types

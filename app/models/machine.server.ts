@@ -2,9 +2,8 @@ import { client } from '~/utils/client.server'
 import type { Namespace } from './namespace.server'
 
 // Routes
-export async function getMachines() {
-  const { data } = await client.get<{ machines: Machine[] }>('/v1/machine')
-  return data
+export function getMachines() {
+  return client.get('v1/machine').json<{ machines: Machine[] }>()
 }
 
 // Types
