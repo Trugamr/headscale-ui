@@ -1,6 +1,7 @@
 import type { ActionArgs } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { Form, useActionData, useLoaderData } from '@remix-run/react'
+import { format } from 'date-fns'
 import { z } from 'zod'
 import { createNamespace, getNamespaces } from '~/models/namespace.server'
 import { ApiError } from '~/utils/client.server'
@@ -40,9 +41,15 @@ export const action = async ({ request }: ActionArgs) => {
 export const loader = async () => {
   const { namespaces } = await getNamespaces()
   const _namespaces = namespaces.map(namespace => {
+    const formattedCreatedAt = format(
+      new Date(namespace.createdAt),
+      'LLL M yyyy, hh:mm a',
+    )
+
     return {
-      ...namespace,
-      createdAt: new Date(namespace.createdAt).toLocaleString(),
+      id: namespace.id,
+      name: namespace.name,
+      formattedCreatedAt,
     }
   })
   return json({ namespaces: _namespaces })
@@ -54,13 +61,13 @@ export default function MachinesRoute() {
   const errors = actionData?.errors ?? {}
 
   return (
-    <main className="p-4">
+    <main>
       {'__unscoped' in errors ? (
         <p className="mb-2 rounded border border-red-200 bg-red-50 px-2 py-1 text-sm text-red-500">
           {errors.__unscoped}
         </p>
       ) : null}
-      <h3 className="mb-2 text-2xl">Namespaces</h3>
+      <h3 className="mb-6 text-3xl font-semibold">Namespaces</h3>
       <table className="mb-5 table-auto">
         <thead>
           <tr className="space-x-3 text-left">
@@ -76,7 +83,7 @@ export default function MachinesRoute() {
             return (
               <tr key={namespace.id}>
                 <td className="py-1 pr-3">{namespace.name}</td>
-                <td className="py-1 pr-3">{namespace.createdAt}</td>
+                <td className="py-1 pr-3">{namespace.formattedCreatedAt}</td>
                 <td className="py-1">
                   <button className="rounded border px-2 shadow-sm">...</button>
                 </td>

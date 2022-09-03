@@ -24,8 +24,8 @@ export default function MachinesRoute() {
   const { machines } = useLoaderData<typeof loader>()
 
   return (
-    <main className="p-4">
-      <h3 className="mb-2 text-2xl">Machines</h3>
+    <main>
+      <h3 className="mb-6 text-3xl font-semibold">Machines</h3>
       <table className="table-auto">
         <thead>
           <tr className="space-x-3 text-left">

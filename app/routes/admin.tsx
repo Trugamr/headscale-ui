@@ -1,42 +1,69 @@
 import type { NavLinkProps } from '@remix-run/react'
 import { Link, NavLink, Outlet } from '@remix-run/react'
 import classNames from 'classnames'
+import { FiGlobe, FiServer, FiSettings } from 'react-icons/fi'
+import type { IconType } from 'react-icons'
 
 export default function AdminRoute() {
   return (
     <div>
-      <div>
-        <div>
-          <header className="flex p-4">
-            <Link to="/admin">
-              <h1>headscale</h1>
-            </Link>
-          </header>
+      <div className="mb-4 bg-gray-100 pt-4">
+        <div className="container mx-auto">
+          <div>
+            <header className="mb-4 flex md:mb-6">
+              <Link to="/admin">
+                <h1 className="text-lg font-semibold">headscale</h1>
+              </Link>
+            </header>
+          </div>
+          <nav className="flex gap-x-2.5 md:gap-x-4">
+            <StyledNavLink to="namespaces" icon={FiGlobe}>
+              Namespaces
+            </StyledNavLink>
+            <StyledNavLink to="machines" icon={FiServer}>
+              Machines
+            </StyledNavLink>
+            <StyledNavLink to="settings" icon={FiSettings}>
+              Settings
+            </StyledNavLink>
+          </nav>
         </div>
-        <nav className="flex gap-x-2 border px-4">
-          <StyledNavLink to="namespaces">Namespaces</StyledNavLink>
-          <StyledNavLink to="machines">Machines</StyledNavLink>
-          <StyledNavLink to="settings">Settings</StyledNavLink>
-        </nav>
       </div>
-      <Outlet />
+      <div className="container mx-auto">
+        <Outlet />
+      </div>
     </div>
   )
 }
 
 // Components
-function StyledNavLink({ children, className, ...rest }: NavLinkProps) {
+type StyledNavLinkProps = Omit<NavLinkProps, 'children'> & {
+  children: string
+  icon: IconType
+}
+
+function StyledNavLink({
+  children,
+  className,
+  icon: Icon,
+  ...rest
+}: StyledNavLinkProps) {
   return (
     <NavLink
       className={props => {
         const _className =
           typeof className === 'function' ? className(props) : className
 
-        return classNames(props.isActive ? 'underline' : undefined, _className)
+        return classNames(
+          props.isActive ? 'border-primary-500 text-primary-500' : undefined,
+          'gap-x-1 border-b-2 px-0.5 pb-2 align-middle text-base md:gap-x-1.5 md:pb-3',
+          _className,
+        )
       }}
       {...rest}
     >
-      {children}
+      <Icon className="mr-1.5 hidden align-middle text-xl sm:inline" />
+      <span className="align-middle">{children}</span>
     </NavLink>
   )
 }
