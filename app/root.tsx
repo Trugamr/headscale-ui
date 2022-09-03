@@ -16,7 +16,40 @@ export const meta: MetaFunction = () => ({
 })
 
 export const links: LinksFunction = () => {
-  return [{ rel: 'stylesheet', href: styles }]
+  return [
+    {
+      rel: 'preload',
+      as: 'font',
+      href: '/fonts/Poppins/Poppins-Regular.woff',
+      type: 'font/woff',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'preload',
+      as: 'font',
+      href: '/fonts/Poppins/Poppins-Medium.woff',
+      type: 'font/woff',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'preload',
+      as: 'font',
+      href: '/fonts/Poppins/Poppins-SemiBold.woff',
+      type: 'font/woff',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'preload',
+      as: 'font',
+      href: '/fonts/Poppins/Poppins-Bold.woff',
+      type: 'font/woff',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'stylesheet',
+      href: styles,
+    },
+  ]
 }
 
 export default function App() {
