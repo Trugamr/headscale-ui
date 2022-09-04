@@ -107,11 +107,7 @@ export default function MachinesRoute() {
         ) : null}
         <div className="flex flex-col">
           <Form className="flex gap-x-2" method="post">
-            <Input
-              name="name"
-              placeholder="Name"
-              className="border placeholder:px-1.5"
-            />
+            <Input name="name" placeholder="Name" autoComplete="off" />
             <button name="intent" value="create">
               Create
             </button>
