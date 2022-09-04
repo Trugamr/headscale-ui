@@ -1,8 +1,12 @@
 export default function SettingsRoute() {
   return (
     <main>
-      <h3 className="mb-6 text-3xl font-semibold">Settings</h3>
-      <div className="text-gray-500">Coming soon</div>
+      <section>
+        <header className="mb-8">
+          <h3 className="text-3xl font-semibold">Settings</h3>
+        </header>
+        <div className="text-gray-500">Coming soon</div>
+      </section>
     </main>
   )
 }

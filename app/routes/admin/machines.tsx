@@ -25,46 +25,50 @@ export default function MachinesRoute() {
 
   return (
     <main>
-      <h3 className="mb-6 text-3xl font-semibold">Machines</h3>
-      <table className="table-auto">
-        <thead>
-          <tr className="space-x-3 text-left">
-            <th className="py-1 pr-3">Name</th>
-            <th className="py-1 pr-3">IP</th>
-            <th className="py-1 pr-3">Last Seen</th>
-            <th>
-              <span className="sr-only">Machines action menu</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {machines.map(machine => {
-            return (
-              <tr key={machine.id} className="align-top">
-                <td className="py-1 pr-3">
-                  <div className="flex flex-col">
-                    <span>{machine.givenName}</span>
-                    <span>{machine.namespace.name}</span>
-                  </div>
-                </td>
-                <td className="flex flex-col py-1 pr-3">
-                  <div className="flex flex-col">
-                    {machine.ipAddresses.map(ip => {
-                      return <span key={ip}>{ip}</span>
-                    })}
-                  </div>
-                </td>
-                <td className="py-1 pr-3">{machine.lastSeen}</td>
-                <td className="py-1">
-                  <button className="rounded border px-2 shadow-sm" disabled>
-                    ...
-                  </button>
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+      <section>
+        <header className="mb-8">
+          <h3 className="text-3xl font-semibold">Machines</h3>
+        </header>
+        <table className="table-auto">
+          <thead>
+            <tr className="space-x-3 text-left">
+              <th className="py-1 pr-3">Name</th>
+              <th className="py-1 pr-3">IP</th>
+              <th className="py-1 pr-3">Last Seen</th>
+              <th>
+                <span className="sr-only">Machines action menu</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {machines.map(machine => {
+              return (
+                <tr key={machine.id} className="align-top">
+                  <td className="py-1 pr-3">
+                    <div className="flex flex-col">
+                      <span>{machine.givenName}</span>
+                      <span>{machine.namespace.name}</span>
+                    </div>
+                  </td>
+                  <td className="flex flex-col py-1 pr-3">
+                    <div className="flex flex-col">
+                      {machine.ipAddresses.map(ip => {
+                        return <span key={ip}>{ip}</span>
+                      })}
+                    </div>
+                  </td>
+                  <td className="py-1 pr-3">{machine.lastSeen}</td>
+                  <td className="py-1">
+                    <button className="rounded border px-2 shadow-sm" disabled>
+                      ...
+                    </button>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </section>
     </main>
   )
 }

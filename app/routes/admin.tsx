@@ -7,7 +7,7 @@ import type { IconType } from 'react-icons'
 export default function AdminRoute() {
   return (
     <div>
-      <div className="mb-4 bg-gray-100 pt-4">
+      <div className="mb-6 bg-gray-100 pt-4">
         <div className="container mx-auto">
           <div>
             <header className="mb-4 flex md:mb-6">
