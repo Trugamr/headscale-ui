@@ -1,16 +1,25 @@
 import { json } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
+import { format } from 'date-fns'
+import Button from '~/components/button'
+import Table from '~/components/table'
 import { getMachines } from '~/models/machine.server'
+import { FiMoreHorizontal } from 'react-icons/fi'
 
 export const loader = async () => {
   const { machines } = await getMachines()
 
   const _machines = machines.map(machine => {
+    const formattedLastSeen = format(
+      new Date(machine.lastSeen),
+      'LLL M yyyy, hh:mm a',
+    )
+
     return {
       id: machine.id,
       givenName: machine.givenName,
       ipAddresses: machine.ipAddresses,
-      lastSeen: new Date(machine.lastSeen).toLocaleString(),
+      formattedLastSeen,
       namespace: {
         name: machine.namespace.name,
       },
@@ -29,45 +38,52 @@ export default function MachinesRoute() {
         <header className="mb-8">
           <h3 className="text-3xl font-semibold">Machines</h3>
         </header>
-        <table className="table-auto">
-          <thead>
-            <tr className="space-x-3 text-left">
-              <th className="py-1 pr-3">Name</th>
-              <th className="py-1 pr-3">IP</th>
-              <th className="py-1 pr-3">Last Seen</th>
-              <th>
-                <span className="sr-only">Machines action menu</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {machines.map(machine => {
-              return (
-                <tr key={machine.id} className="align-top">
-                  <td className="py-1 pr-3">
-                    <div className="flex flex-col">
-                      <span>{machine.givenName}</span>
-                      <span>{machine.namespace.name}</span>
-                    </div>
-                  </td>
-                  <td className="flex flex-col py-1 pr-3">
-                    <div className="flex flex-col">
-                      {machine.ipAddresses.map(ip => {
-                        return <span key={ip}>{ip}</span>
-                      })}
-                    </div>
-                  </td>
-                  <td className="py-1 pr-3">{machine.lastSeen}</td>
-                  <td className="py-1">
-                    <button className="rounded border px-2 shadow-sm" disabled>
-                      ...
-                    </button>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <Table
+          className="w-full"
+          rows={machines}
+          columns={[
+            {
+              key: 'name',
+              title: 'Name',
+              render: row => (
+                <div className="flex flex-col">
+                  <span>{row.givenName}</span>
+                  <span>{row.namespace.name}</span>
+                </div>
+              ),
+            },
+            {
+              key: 'ip',
+              title: 'ip',
+              render: row => (
+                <div className="flex flex-col">
+                  {row.ipAddresses.map(ip => {
+                    return <span key={ip}>{ip}</span>
+                  })}
+                </div>
+              ),
+            },
+            {
+              key: 'last-seen',
+              title: 'Last Seen',
+              className: 'text-sm align-top',
+              render: row => row.formattedLastSeen,
+            },
+            {
+              key: 'action-menu',
+              title: <span className="sr-only">Namespaces action menu</span>,
+              render: row => (
+                <Button
+                  className="rounded border border-transparent py-1 px-2 text-lg hover:border-gray-200 hover:shadow-sm"
+                  title={row.id}
+                >
+                  <FiMoreHorizontal />
+                </Button>
+              ),
+            },
+          ]}
+          rowKey={row => row.id}
+        />
       </section>
     </main>
   )

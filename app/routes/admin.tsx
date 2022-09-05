@@ -62,7 +62,7 @@ function StyledNavLink({
       }}
       {...rest}
     >
-      <Icon className="mr-1.5 hidden align-middle text-xl sm:inline" />
+      <Icon className="mr-1.5 hidden align-middle text-lg sm:inline" />
       <span className="align-middle">{children}</span>
     </NavLink>
   )
