@@ -77,7 +77,7 @@ export default function MachinesRoute() {
           <h3 className="text-3xl font-semibold">Namespaces</h3>
         </header>
         <Table
-          className="w-full"
+          className="w-full text-sm"
           columns={[
             {
               key: 'name',
@@ -87,18 +87,14 @@ export default function MachinesRoute() {
             {
               key: 'created-at',
               title: 'Created At',
-              className: 'text-sm',
               render: row => row.formattedCreatedAt,
             },
             {
               key: 'action-menu',
               title: <span className="sr-only">Namespaces action menu</span>,
               render: row => (
-                <Button
-                  className="rounded border border-transparent py-1 px-2 text-lg hover:border-gray-200 hover:shadow-sm"
-                  title={row.id}
-                >
-                  <FiMoreHorizontal />
+                <Button title={row.id} variant="ghost" size="sm">
+                  <FiMoreHorizontal className="text-lg" />
                 </Button>
               ),
             },
@@ -109,12 +105,12 @@ export default function MachinesRoute() {
       </section>
       <section>
         <header className="mb-2">
-          <h4 className="text-lg">Add new namespace</h4>
+          <h4 className="text-xl font-semibold">Create Namespace</h4>
         </header>
         <div className="flex flex-col">
           <Form className="flex gap-x-2" method="post">
             <Input name="name" placeholder="Name" autoComplete="off" />
-            <Button name="intent" value="create">
+            <Button name="intent" value="create" variant="primary">
               Create
             </Button>
           </Form>

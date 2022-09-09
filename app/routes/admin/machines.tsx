@@ -39,7 +39,7 @@ export default function MachinesRoute() {
           <h3 className="text-3xl font-semibold">Machines</h3>
         </header>
         <Table
-          className="w-full"
+          className="w-full text-sm"
           rows={machines}
           columns={[
             {
@@ -47,7 +47,7 @@ export default function MachinesRoute() {
               title: 'Name',
               render: row => (
                 <div className="flex flex-col">
-                  <span>{row.givenName}</span>
+                  <span className="font-medium">{row.givenName}</span>
                   <span>{row.namespace.name}</span>
                 </div>
               ),
@@ -66,18 +66,15 @@ export default function MachinesRoute() {
             {
               key: 'last-seen',
               title: 'Last Seen',
-              className: 'text-sm align-top',
+              className: 'align-top',
               render: row => row.formattedLastSeen,
             },
             {
               key: 'action-menu',
               title: <span className="sr-only">Namespaces action menu</span>,
               render: row => (
-                <Button
-                  className="rounded border border-transparent py-1 px-2 text-lg hover:border-gray-200 hover:shadow-sm"
-                  title={row.id}
-                >
-                  <FiMoreHorizontal />
+                <Button title={row.id} variant="ghost" size="sm">
+                  <FiMoreHorizontal className="text-lg" />
                 </Button>
               ),
             },
