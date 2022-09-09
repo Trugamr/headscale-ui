@@ -39,6 +39,8 @@ const defaultResponseErrorHandler: AfterResponseHook = async (
 ) => {
   const _response = response.clone()
 
+  console.log(request.method, request.url)
+
   // If response is not ok validate if error message is returned
   // Throw ApiError if valid error message is returned from api
   if (!_response.ok) {

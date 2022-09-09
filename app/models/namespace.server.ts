@@ -9,6 +9,10 @@ export function createNamespace({ name }: CreateNamespaceOptions) {
   return client.post('v1/namespace', { json: { name } }).json<Namespace>()
 }
 
+export function removeNamespace({ name }: RemoveNamespaceOptions) {
+  return client.delete(`v1/namespace/${name}`).json<{}>()
+}
+
 // Types
 export type Namespace = {
   id: string
@@ -17,5 +21,9 @@ export type Namespace = {
 }
 
 type CreateNamespaceOptions = {
+  name: string
+}
+
+type RemoveNamespaceOptions = {
   name: string
 }

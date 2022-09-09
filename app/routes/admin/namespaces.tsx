@@ -4,7 +4,11 @@ import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { format } from 'date-fns'
 import { z } from 'zod'
 import Input from '~/components/input'
-import { createNamespace, getNamespaces } from '~/models/namespace.server'
+import {
+  createNamespace,
+  getNamespaces,
+  removeNamespace,
+} from '~/models/namespace.server'
 import { ApiError } from '~/utils/client.server'
 import { FiAlertCircle, FiMoreHorizontal } from 'react-icons/fi'
 import Button from '~/components/button'
@@ -33,7 +37,40 @@ export const action = async ({ request }: ActionArgs) => {
         )
       }
       return json(
-        { errors: { __unscoped: 'Something went wrong' } },
+        {
+          errors: {
+            __unscoped: 'Something went wrong while creating namespace',
+          },
+        },
+        { status: 500 },
+      )
+    }
+  }
+
+  if (body.intent === 'remove') {
+    const parsed = z.object({ name: z.string() }).safeParse(body)
+    if (!parsed.success) {
+      return json(
+        { errors: { __unscoped: 'Namespace name should be a string' } },
+        { status: 400 },
+      )
+    }
+    try {
+      await removeNamespace({ name: parsed.data.name })
+      return json({ success: true, errors: null })
+    } catch (error) {
+      if (error instanceof ApiError) {
+        return json(
+          { errors: { __unscoped: error.message } },
+          { status: error.response.status },
+        )
+      }
+      return json(
+        {
+          errors: {
+            __unscoped: 'Something went wrong while removing namespace',
+          },
+        },
         { status: 500 },
       )
     }
