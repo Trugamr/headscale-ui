@@ -6,6 +6,7 @@ import { forwardRef } from 'react'
 export type ButtonProps = ComponentProps<'button'> & {
   variant?: 'outline' | 'primary' | 'ghost'
   size?: 'base' | 'sm'
+  danger?: boolean
 }
 
 function ButtonComponent(
@@ -14,6 +15,7 @@ function ButtonComponent(
     className,
     size = 'base',
     variant = 'outline',
+    danger,
     ...rest
   }: ButtonProps,
   ref: ForwardedRef<HTMLButtonElement>,
@@ -28,6 +30,9 @@ function ButtonComponent(
     {
       'button-base': size === 'base',
       'button-sm': size === 'sm',
+    },
+    {
+      'button-danger': danger,
     },
   ]
 

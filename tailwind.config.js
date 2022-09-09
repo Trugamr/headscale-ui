@@ -9,6 +9,7 @@ module.exports = {
       colors: {
         gray: colors.stone,
         primary: colors.blue,
+        danger: colors.red,
       },
       fontFamily: {
         sans: ['Poppins', ...defaultTheme.fontFamily.sans],
