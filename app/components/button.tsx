@@ -1,12 +1,13 @@
 import type { Argument } from 'classnames'
 import classNames from 'classnames'
-import type { ComponentProps, ForwardedRef } from 'react'
+import type { ComponentProps, ForwardedRef, ReactNode } from 'react'
 import { forwardRef } from 'react'
 
 export type ButtonProps = ComponentProps<'button'> & {
   variant?: 'outline' | 'primary' | 'ghost'
   size?: 'base' | 'sm'
   danger?: boolean
+  icon?: ReactNode
 }
 
 function ButtonComponent(
@@ -16,6 +17,7 @@ function ButtonComponent(
     size = 'base',
     variant = 'outline',
     danger,
+    icon,
     ...rest
   }: ButtonProps,
   ref: ForwardedRef<HTMLButtonElement>,
@@ -28,17 +30,21 @@ function ButtonComponent(
       'button-ghost': variant == 'ghost',
     },
     {
-      'button-base': size === 'base',
-      'button-sm': size === 'sm',
+      'button--base': size === 'base',
+      'button--sm': size === 'sm',
     },
     {
-      'button-danger': danger,
+      'button--square': typeof children === 'undefined',
+    },
+    {
+      'button--danger': danger,
     },
   ]
 
   return (
     <button className={classNames(classes)} {...rest} ref={ref}>
-      {children}
+      {icon}
+      {typeof children === 'string' ? <span>{children}</span> : children}
     </button>
   )
 }
