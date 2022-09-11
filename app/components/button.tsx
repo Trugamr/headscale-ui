@@ -4,7 +4,7 @@ import type { ComponentProps, ForwardedRef, ReactNode } from 'react'
 import { forwardRef } from 'react'
 
 export type ButtonProps = ComponentProps<'button'> & {
-  variant?: 'outline' | 'primary' | 'ghost'
+  variant?: 'outline' | 'primary' | 'ghost' | 'subtle'
   size?: 'base' | 'sm'
   danger?: boolean
   icon?: ReactNode
@@ -28,6 +28,7 @@ function ButtonComponent(
       'button-outline': variant == 'outline',
       'button-primary': variant == 'primary',
       'button-ghost': variant == 'ghost',
+      'button-subtle': variant == 'subtle',
     },
     {
       'button--base': size === 'base',

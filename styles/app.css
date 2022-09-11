@@ -66,13 +66,16 @@
 }
 
 .button-primary {
-  @apply text-gray-50 border border-primary-500 bg-primary-500 enabled:hover:bg-primary-600 enabled:hover:border-primary-600 leading-tight disabled:bg-primary-300 disabled:border-primary-300;
+  @apply text-white border border-primary-500 bg-primary-500 enabled:hover:bg-primary-600 enabled:hover:border-primary-600 leading-tight disabled:bg-primary-300 disabled:border-primary-300;
 }
 
 .button-ghost {
   @apply enabled:hover:bg-white enabled:hover:shadow-sm border border-transparent enabled:hover:border-gray-200 disabled:text-gray-400;
 }
 
+.button-subtle {
+  @apply enabled:hover:bg-gray-50 only:disabled:text-gray-400;
+}
 
 /* TODO: Add danger for other variants */
 .button--danger.button-primary  {
@@ -81,4 +84,8 @@
 
 .button--danger.button-ghost {
   @apply text-danger-500 enabled:hover:bg-danger-50 enabled:hover:shadow-sm border border-transparent enabled:hover:border-danger-200 disabled:text-danger-400;
+}
+
+.button--danger.button-subtle {
+  @apply text-danger-500 enabled:hover:bg-danger-50 disabled:text-danger-400;
 }

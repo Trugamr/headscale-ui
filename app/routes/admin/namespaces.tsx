@@ -1,6 +1,7 @@
 import type { ActionArgs } from '@remix-run/node'
+import { redirect } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import { Form, useActionData, useLoaderData } from '@remix-run/react'
+import { Form, Outlet, useActionData, useLoaderData } from '@remix-run/react'
 import { format } from 'date-fns'
 import { z } from 'zod'
 import Input from '~/components/input'
@@ -55,25 +56,10 @@ export const action = async ({ request }: ActionArgs) => {
         { status: 400 },
       )
     }
-    try {
-      await removeNamespace({ name: parsed.data.name })
-      return json({ success: true, errors: null })
-    } catch (error) {
-      if (error instanceof ApiError) {
-        return json(
-          { errors: { __unscoped: error.message } },
-          { status: error.response.status },
-        )
-      }
-      return json(
-        {
-          errors: {
-            __unscoped: 'Something went wrong while removing namespace',
-          },
-        },
-        { status: 500 },
-      )
-    }
+    // Namespace name can be empty string so we redirect with a space
+    // Using which api correctly returns the namespace with empty string
+    const name = parsed.data.name === '' ? ' ' : parsed.data.name
+    return redirect(`/admin/namespaces/${name}/remove`)
   }
 
   throw new Error('Invalid intent')
@@ -156,6 +142,8 @@ export default function MachinesRoute() {
           ) : null}
         </div>
       </section>
+
+      <Outlet />
     </main>
   )
 }
