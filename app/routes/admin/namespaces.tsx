@@ -5,15 +5,15 @@ import { Form, Outlet, useActionData, useLoaderData } from '@remix-run/react'
 import { format } from 'date-fns'
 import { z } from 'zod'
 import Input from '~/components/input'
-import {
-  createNamespace,
-  getNamespaces,
-  removeNamespace,
-} from '~/models/namespace.server'
+import type { Namespace } from '~/models/namespace.server'
+import { createNamespace, getNamespaces } from '~/models/namespace.server'
 import { ApiError } from '~/utils/client.server'
 import { FiAlertCircle, FiMoreHorizontal } from 'react-icons/fi'
 import Button from '~/components/button'
 import Table from '~/components/table'
+import { Menu } from '@headlessui/react'
+import { Float } from '@headlessui-float/react'
+import classNames from 'classnames'
 
 export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData()
@@ -115,11 +115,9 @@ export default function MachinesRoute() {
             {
               key: 'action-menu',
               title: <span className="sr-only">Namespaces action menu</span>,
-              render: row => (
-                <Button title={row.id} variant="ghost" size="sm">
-                  <FiMoreHorizontal className="text-lg" />
-                </Button>
-              ),
+              render: row => {
+                return <NamespaceMenu namespace={row} />
+              },
             },
           ]}
           rows={namespaces}
@@ -145,5 +143,62 @@ export default function MachinesRoute() {
 
       <Outlet />
     </main>
+  )
+}
+
+// Components
+type NamespaceMenuProps = {
+  namespace: Pick<Namespace, 'name'>
+}
+
+function NamespaceMenu({ namespace }: NamespaceMenuProps) {
+  const menuGroupClassName = 'flex flex-col'
+  const menuItemClassName =
+    'truncate text-ellipsis px-3 py-1.5 text-left ui-active:bg-gray-100 ui-disabled:text-gray-300'
+
+  return (
+    <Menu>
+      <Float
+        placement="left-start"
+        offset={8}
+        enter="transition-opacity duration-75"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+      >
+        <Menu.Button
+          as={Button}
+          variant="ghost"
+          icon={<FiMoreHorizontal className="text-lg" />}
+        />
+        <Menu.Items
+          as={Form}
+          method="post"
+          className="w-52 rounded-md border border-gray-200 bg-white py-1 text-base shadow-lg focus:outline-none"
+        >
+          <input name="name" defaultValue={namespace.name} hidden />
+          <div className={menuGroupClassName}>
+            <Menu.Item
+              as="button"
+              className={menuItemClassName}
+              disabled
+              type="button"
+            >
+              Edit namespace
+            </Menu.Item>
+          </div>
+          <hr className="my-1 border-gray-200" />
+          <div className={menuGroupClassName}>
+            <Menu.Item
+              as="button"
+              className={classNames('text-danger-500', menuItemClassName)}
+              name="intent"
+              value="remove"
+            >
+              Remove namepsace
+            </Menu.Item>
+          </div>
+        </Menu.Items>
+      </Float>
+    </Menu>
   )
 }
