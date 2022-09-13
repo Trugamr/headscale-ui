@@ -3,6 +3,7 @@ import type { ActionArgs, LoaderArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { Form, useActionData, useLoaderData } from '@remix-run/react'
+import { useRef } from 'react'
 import { FiX } from 'react-icons/fi'
 import invariant from 'tiny-invariant'
 import Button from '~/components/button'
@@ -56,9 +57,16 @@ export default function RemoveNamespaceRoute() {
   const { namespace } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const errors = actionData?.errors ?? { __unscoped: undefined }
+  const removeButtonRef = useRef<HTMLButtonElement>(null)
 
   return (
-    <Dialog as="div" className="relative z-10" open onClose={noOp}>
+    <Dialog
+      as="div"
+      className="relative z-10"
+      open
+      initialFocus={removeButtonRef}
+      onClose={noOp}
+    >
       <div className="fixed inset-0 bg-black bg-opacity-25" />
       <div className="fixed inset-0 overflow-y-auto">
         <Form
@@ -88,7 +96,7 @@ export default function RemoveNamespaceRoute() {
               </p>
             ) : null}
 
-            <div className="mt-5">
+            <div className="mt-4">
               <p className="text-sm text-gray-700">
                 This namespace will permanently be removed.
               </p>
@@ -99,6 +107,7 @@ export default function RemoveNamespaceRoute() {
                 Cancel
               </Button>
               <Button
+                ref={removeButtonRef}
                 name="intent"
                 value="remove_confirm"
                 variant="primary"
