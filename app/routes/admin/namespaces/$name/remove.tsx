@@ -2,7 +2,12 @@ import { Dialog } from '@headlessui/react'
 import type { ActionArgs, LoaderArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import { Form, useActionData, useLoaderData } from '@remix-run/react'
+import {
+  Form,
+  useActionData,
+  useFetcher,
+  useLoaderData,
+} from '@remix-run/react'
 import { useRef } from 'react'
 import { FiX } from 'react-icons/fi'
 import invariant from 'tiny-invariant'
@@ -58,6 +63,7 @@ export default function RemoveNamespaceRoute() {
   const actionData = useActionData<typeof action>()
   const errors = actionData?.errors ?? { __unscoped: undefined }
   const removeButtonRef = useRef<HTMLButtonElement>(null)
+  const cancelFetcher = useFetcher()
 
   return (
     <Dialog
@@ -65,7 +71,9 @@ export default function RemoveNamespaceRoute() {
       className="relative z-10"
       open
       initialFocus={removeButtonRef}
-      onClose={noOp}
+      onClose={() => {
+        cancelFetcher.submit({ intent: 'cancel' }, { method: 'post' })
+      }}
     >
       <div className="fixed inset-0 bg-black bg-opacity-25" />
       <div className="fixed inset-0 overflow-y-auto">
