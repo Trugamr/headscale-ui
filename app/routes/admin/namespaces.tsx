@@ -8,7 +8,7 @@ import Input from '~/components/input'
 import type { Namespace } from '~/models/namespace.server'
 import { createNamespace, getNamespaces } from '~/models/namespace.server'
 import { ApiError } from '~/utils/client.server'
-import { FiAlertCircle, FiMoreHorizontal } from 'react-icons/fi'
+import { FiMoreHorizontal } from 'react-icons/fi'
 import Button from '~/components/button'
 import Table from '~/components/table'
 import { Menu } from '@headlessui/react'
@@ -20,7 +20,7 @@ export const action = async ({ request }: ActionArgs) => {
   const body = Object.fromEntries(formData)
 
   if (body.intent === 'create') {
-    const parsed = z.object({ name: z.string().max(63) }).safeParse(body)
+    const parsed = z.object({ name: z.string().min(1).max(63) }).safeParse(body)
     if (!parsed.success) {
       return json(
         { errors: parsed.error.flatten().fieldErrors },
@@ -58,7 +58,7 @@ export const action = async ({ request }: ActionArgs) => {
     }
     // Namespace name can be empty string so we redirect with a space
     // Using which api correctly returns the namespace with empty string
-    const name = parsed.data.name === '' ? ' ' : parsed.data.name
+    const name = parsed.data.name
     return redirect(`/admin/namespaces/${name}/remove`)
   }
 
@@ -143,7 +143,7 @@ export default function MachinesRoute() {
         </header>
         <div className="flex flex-col">
           <Form className="flex gap-x-2" method="post">
-            <Input name="name" placeholder="Name" autoComplete="off" />
+            <Input name="name" placeholder="Name" autoComplete="off" required />
             <Button name="intent" value="create" variant="primary">
               Create
             </Button>
