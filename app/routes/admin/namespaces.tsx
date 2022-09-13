@@ -1,7 +1,13 @@
 import type { ActionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import { Form, Outlet, useActionData, useLoaderData } from '@remix-run/react'
+import {
+  Form,
+  Outlet,
+  useActionData,
+  useLoaderData,
+  useTransition,
+} from '@remix-run/react'
 import { format } from 'date-fns'
 import { z } from 'zod'
 import Input from '~/components/input'
@@ -14,6 +20,8 @@ import Table from '~/components/table'
 import { Menu } from '@headlessui/react'
 import { Float } from '@headlessui-float/react'
 import classNames from 'classnames'
+import { useEffect, useRef } from 'react'
+import invariant from 'tiny-invariant'
 
 export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData()
@@ -101,6 +109,24 @@ export default function MachinesRoute() {
   const actionData = useActionData<typeof action>()
   const errors = actionData?.errors ?? {}
 
+  const createFormRef = useRef<HTMLFormElement>(null)
+  const transition = useTransition()
+
+  // Clear form input on submission
+  useEffect(() => {
+    invariant(createFormRef.current)
+
+    const isLoading = transition.state === 'loading'
+    const isCreating =
+      transition.submission?.formData.get('intent') === 'create'
+    const hasErrors = Boolean(actionData?.errors)
+
+    // If intent was create and there are no errors we reset the form
+    if (isLoading && isCreating && !hasErrors) {
+      createFormRef.current.reset()
+    }
+  }, [actionData?.errors, transition])
+
   return (
     <main>
       {'__unscoped' in errors ? (
@@ -142,7 +168,7 @@ export default function MachinesRoute() {
           <h4 className="text-xl font-semibold">Create Namespace</h4>
         </header>
         <div className="flex flex-col">
-          <Form className="flex gap-x-2" method="post">
+          <Form className="flex gap-x-2" method="post" ref={createFormRef}>
             <Input name="name" placeholder="Name" autoComplete="off" required />
             <Button name="intent" value="create" variant="primary">
               Create
