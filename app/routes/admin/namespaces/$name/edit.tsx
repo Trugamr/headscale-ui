@@ -11,8 +11,10 @@ import {
 import { useRef } from 'react'
 import { FiX } from 'react-icons/fi'
 import invariant from 'tiny-invariant'
+import { z } from 'zod'
 import Button from '~/components/button'
-import { getNamespace, removeNamespace } from '~/models/namespace.server'
+import Input from '~/components/input'
+import { getNamespace, renameNamespace } from '~/models/namespace.server'
 import { ApiError } from '~/utils/client.server'
 
 export const action = async ({ request, params }: ActionArgs) => {
@@ -27,9 +29,19 @@ export const action = async ({ request, params }: ActionArgs) => {
     return redirect(namespacesRoute)
   }
 
-  if (body.intent === 'remove_confirm') {
+  if (body.intent === 'update_name') {
+    const parsed = z.object({ name: z.string() }).safeParse(body)
+    if (!parsed.success) {
+      return json(
+        { errors: { __unscoped: 'Namespace name should be a string' } },
+        { status: 400 },
+      )
+    }
     try {
-      await removeNamespace({ name: params.name })
+      await renameNamespace({
+        before: params.name,
+        after: parsed.data.name,
+      })
       return redirect(namespacesRoute)
     } catch (error) {
       if (error instanceof ApiError) {
@@ -41,7 +53,7 @@ export const action = async ({ request, params }: ActionArgs) => {
       return json(
         {
           errors: {
-            __unscoped: 'Something went wrong while removing namespace',
+            __unscoped: 'Something went wrong while creating namespace',
           },
         },
         { status: 500 },
@@ -62,7 +74,7 @@ export default function RemoveNamespaceRoute() {
   const { namespace } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const errors = actionData?.errors ?? { __unscoped: undefined }
-  const removeButtonRef = useRef<HTMLButtonElement>(null)
+  const nameInputRef = useRef<HTMLInputElement>(null)
   const cancelFetcher = useFetcher()
 
   return (
@@ -70,32 +82,30 @@ export default function RemoveNamespaceRoute() {
       as="div"
       className="relative z-10"
       open
-      initialFocus={removeButtonRef}
+      initialFocus={nameInputRef}
       onClose={() => {
         cancelFetcher.submit({ intent: 'cancel' }, { method: 'post' })
       }}
     >
       <div className="fixed inset-0 bg-black bg-opacity-25" />
       <div className="fixed inset-0 overflow-y-auto">
-        <Form
-          method="post"
-          replace
-          className="flex min-h-full items-center justify-center p-4 text-center"
-        >
+        <div className="flex min-h-full items-center justify-center p-4 text-center">
           <Dialog.Panel className="w-full max-w-lg overflow-hidden rounded-md bg-white p-6 text-left shadow-xl">
             <div className="flex justify-between gap-x-4">
               <Dialog.Title
                 as="h3"
                 className="align-middle text-lg font-medium leading-6 text-gray-900"
               >
-                Remove {namespace.name}
+                Edit namespace name for {namespace.name}
               </Dialog.Title>
-              <Button
-                name="intent"
-                value="cancel"
-                variant="subtle"
-                icon={<FiX className="text-lg" />}
-              />
+              <Form method="post" replace>
+                <Button
+                  name="intent"
+                  value="cancel"
+                  variant="subtle"
+                  icon={<FiX className="text-lg" />}
+                />
+              </Form>
             </div>
 
             {'__unscoped' in errors ? (
@@ -106,26 +116,38 @@ export default function RemoveNamespaceRoute() {
 
             <div className="mt-4">
               <p className="text-sm text-gray-700">
-                This namespace will permanently be removed.
+                This namespace name will be shown in admin panel.
               </p>
             </div>
 
-            <div className="mt-8 flex justify-end gap-x-3">
-              <Button name="intent" value="cancel">
-                Cancel
-              </Button>
-              <Button
-                ref={removeButtonRef}
-                name="intent"
-                value="remove_confirm"
-                variant="primary"
-                danger
-              >
-                Remove <span className="hidden sm:inline">namespace</span>
-              </Button>
-            </div>
+            <Form method="post" replace>
+              <div className="mt-6 flex flex-col">
+                <label htmlFor="namespace-name" className="mb-2 max-w-max">
+                  Namespace name
+                </label>
+                <Input
+                  ref={nameInputRef}
+                  id="namespace-name"
+                  type="text"
+                  name="name"
+                  defaultValue={namespace.name}
+                />
+              </div>
+
+              {/* This is placed as first button in form so it can be triggered by pressing Enter key */}
+              <input type="submit" name="intent" value="update_name" hidden />
+
+              <div className="mt-8 flex justify-end gap-x-3">
+                <Button name="intent" value="cancel">
+                  Cancel
+                </Button>
+                <Button name="intent" value="update_name" variant="primary">
+                  Update name
+                </Button>
+              </div>
+            </Form>
           </Dialog.Panel>
-        </Form>
+        </div>
       </div>
     </Dialog>
   )

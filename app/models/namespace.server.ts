@@ -10,11 +10,19 @@ export function getNamespace({ name }: GetNamespaceOptions) {
 }
 
 export function createNamespace({ name }: CreateNamespaceOptions) {
-  return client.post('v1/namespace', { json: { name } }).json<Namespace>()
+  return client
+    .post('v1/namespace', { json: { name } })
+    .json<{ namespace: Namespace }>()
 }
 
 export function removeNamespace({ name }: RemoveNamespaceOptions) {
   return client.delete(`v1/namespace/${name}`).json<{}>()
+}
+
+export function renameNamespace({ before, after }: RenameNamespaceOptions) {
+  return client
+    .post(`v1/namespace/${before}/rename/${after}`)
+    .json<{ namespace: Namespace }>()
 }
 
 // Types
@@ -34,4 +42,9 @@ type CreateNamespaceOptions = {
 
 type RemoveNamespaceOptions = {
   name: string
+}
+
+type RenameNamespaceOptions = {
+  before: string
+  after: string
 }

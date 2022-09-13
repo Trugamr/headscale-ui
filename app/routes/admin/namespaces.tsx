@@ -28,7 +28,7 @@ export const action = async ({ request }: ActionArgs) => {
       )
     }
     try {
-      const namespace = await createNamespace({ name: parsed.data.name })
+      const { namespace } = await createNamespace({ name: parsed.data.name })
       return json({ namespace, errors: null })
     } catch (error) {
       if (error instanceof ApiError) {
@@ -62,6 +62,20 @@ export const action = async ({ request }: ActionArgs) => {
     return redirect(`/admin/namespaces/${name}/remove`)
   }
 
+  if (body.intent === 'edit') {
+    const parsed = z.object({ name: z.string() }).safeParse(body)
+    if (!parsed.success) {
+      return json(
+        { errors: { __unscoped: 'Namespace name should be a string' } },
+        { status: 400 },
+      )
+    }
+    // Namespace name can be empty string so we redirect with a space
+    // Using which api correctly returns the namespace with empty string
+    const name = parsed.data.name === '' ? ' ' : parsed.data.name
+    return redirect(`/admin/namespaces/${name}/edit`)
+  }
+
   throw new Error('Invalid intent')
 }
 
@@ -90,8 +104,7 @@ export default function MachinesRoute() {
   return (
     <main>
       {'__unscoped' in errors ? (
-        <p className="mb-3 max-w-max rounded border border-red-200 bg-red-50 px-2 py-1 text-red-500">
-          <FiAlertCircle className="mr-1.5 inline-block align-middle text-base" />
+        <p className="mb-4 text-red-500">
           <span className="text-sm">{errors.__unscoped}</span>
         </p>
       ) : null}
@@ -179,9 +192,9 @@ function NamespaceMenu({ namespace }: NamespaceMenuProps) {
           <div className={menuGroupClassName}>
             <Menu.Item
               as="button"
+              name="intent"
+              value="edit"
               className={menuItemClassName}
-              disabled
-              type="button"
             >
               Edit namespace
             </Menu.Item>
