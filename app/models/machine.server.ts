@@ -6,8 +6,14 @@ export function getMachines() {
   return client.get('v1/machine').json<{ machines: Machine[] }>()
 }
 
+export function registerMachine(params: RegisterMachineOptions) {
+  return client
+    .post('v1/machine/register', { searchParams: params })
+    .json<{ machine: Machine }>()
+}
+
 // Types
-type Machine = {
+export type Machine = {
   id: string
   machineKey: string
   nodeKey: string
@@ -25,4 +31,9 @@ type Machine = {
   invalidTags: string[]
   validTags: string[]
   givenName: string
+}
+
+type RegisterMachineOptions = {
+  namespace: string
+  key: string
 }

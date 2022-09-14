@@ -134,7 +134,7 @@ export default function MachinesRoute() {
           <span className="text-sm">{errors.__unscoped}</span>
         </p>
       ) : null}
-      <section className="mb-6">
+      <section>
         <header className="mb-8">
           <h3 className="text-3xl font-semibold">Namespaces</h3>
         </header>
@@ -163,11 +163,11 @@ export default function MachinesRoute() {
           rowKey={row => row.id}
         />
       </section>
-      <section>
-        <header className="mb-2">
+      <section className="mt-8">
+        <header>
           <h4 className="text-xl font-semibold">Create Namespace</h4>
         </header>
-        <div className="flex flex-col">
+        <div className="mt-2 flex flex-col gap-y-1">
           <Form className="flex gap-x-2" method="post" ref={createFormRef}>
             <Input name="name" placeholder="Name" autoComplete="off" required />
             <Button name="intent" value="create" variant="primary">
