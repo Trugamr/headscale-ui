@@ -169,7 +169,13 @@ export default function MachinesRoute() {
         </header>
         <div className="mt-2 flex flex-col gap-y-1">
           <Form className="flex gap-x-2" method="post" ref={createFormRef}>
-            <Input name="name" placeholder="Name" autoComplete="off" required />
+            <Input
+              className="flex-grow sm:flex-grow-0"
+              name="name"
+              placeholder="Name"
+              autoComplete="off"
+              required
+            />
             <Button name="intent" value="create" variant="primary">
               Create
             </Button>
