@@ -7,3 +7,5 @@ node_modules
 
 /prisma/data.db
 /prisma/data.db-journal
+
+/app/styles/app.css
