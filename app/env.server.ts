@@ -1,11 +1,12 @@
-import invariant from 'tiny-invariant'
+import { z } from 'zod'
 
 export function getEnv() {
-  invariant(process.env.HEADSCALE_API_KEY, 'HEADSCALE_API_KEY not set')
-  invariant(process.env.HEADSCALE_API_URL, 'HEADSCALE_API_URL not set')
+  const schema = z.object({
+    NODE_ENV: z.enum(['development', 'production']),
+    HEADSCALE_API_KEY: z.string(),
+    HEADSCALE_API_URL: z.string(),
+    SESSION_SECRET: z.string(),
+  })
 
-  return {
-    HEADSCALE_API_KEY: process.env.HEADSCALE_API_KEY,
-    HEADSCALE_API_URL: process.env.HEADSCALE_API_URL,
-  }
+  return schema.parse(process.env)
 }
