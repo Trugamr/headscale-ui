@@ -1,47 +1,52 @@
 import type { ActionArgs, LoaderArgs } from '@remix-run/node'
+import { redirect } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import { Response } from '@remix-run/node'
 import { Form, useActionData } from '@remix-run/react'
-import { AuthorizationError } from 'remix-auth'
+import { z } from 'zod'
 import Button from '~/components/button'
 import Input from '~/components/input'
-import { authenticator } from '~/services/auth.server'
+import { login } from '~/models/user.server'
+import { createUserSession, getUserId } from '~/utils/session.server'
 
 export const action = async ({ request }: ActionArgs) => {
-  try {
-    throw await authenticator.authenticate('email-password', request, {
-      successRedirect: '/admin',
-      throwOnError: true,
-    })
-  } catch (error) {
-    if (error instanceof Response) {
-      throw error
-    }
-    if (error instanceof AuthorizationError) {
-      return json({
-        errors: {
-          __unscoped: error.message,
-        },
-      })
-    }
-    return json({
-      errors: {
-        __unscoped: 'Something went wrong',
-      },
-    })
+  const formData = await request.formData()
+  const body = Object.fromEntries(formData)
+
+  const schema = z.object({
+    email: z.string().email('Email should be valid'),
+    password: z.string().min(6, 'Password must be atleast 6 characters'),
+  })
+
+  const parsed = await schema.safeParseAsync(body)
+  if (!parsed.success) {
+    return json({ errors: parsed.error.flatten().fieldErrors }, { status: 400 })
   }
+
+  const userId = await login({
+    email: parsed.data.email,
+    password: parsed.data.password,
+  })
+  if (!userId) {
+    return json(
+      { errors: { __unscoped: 'Invalid credentials' } },
+      { status: 400 },
+    )
+  }
+
+  return createUserSession(userId, '/admin')
 }
 
 export const loader = async ({ request }: LoaderArgs) => {
-  // If the user is already authenticated redirect to admin dashboard
-  return await authenticator.isAuthenticated(request, {
-    successRedirect: '/admin',
-  })
+  const userId = await getUserId(request)
+  if (userId) {
+    return redirect('/admin')
+  }
+  return json(null)
 }
 
 export default function LoginRoute() {
   const actionData = useActionData<typeof action>()
-  const errors = actionData?.errors ?? { __unscoped: undefined }
+  const errors = actionData?.errors ?? {}
 
   return (
     <main className="flex h-full flex-col">
@@ -61,6 +66,11 @@ export default function LoginRoute() {
           <div className="flex flex-col gap-y-1">
             <label htmlFor="email">Email</label>
             <Input id="email" type="email" name="email" required />
+            {'email' in errors ? (
+              <p className="mb-1 text-sm text-red-500" role="alert">
+                {errors.email}
+              </p>
+            ) : null}
           </div>
           <div className="mt-3 flex flex-col gap-y-1">
             <label htmlFor="password">Password</label>
@@ -71,6 +81,11 @@ export default function LoginRoute() {
               autoComplete="current-password"
               required
             />
+            {'password' in errors ? (
+              <p className="mb-1 text-sm text-red-500" role="alert">
+                {errors.password}
+              </p>
+            ) : null}
           </div>
 
           <Button className="mt-8 w-full" variant="primary">

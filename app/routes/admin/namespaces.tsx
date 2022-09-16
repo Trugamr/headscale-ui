@@ -27,8 +27,15 @@ export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData()
   const body = Object.fromEntries(formData)
 
+  const schema = z.object({
+    name: z
+      .string()
+      .min(1)
+      .max(63, 'Namespace name should not exceed 63 characters'),
+  })
+
   if (body.intent === 'create') {
-    const parsed = z.object({ name: z.string().min(1).max(63) }).safeParse(body)
+    const parsed = schema.safeParse(body)
     if (!parsed.success) {
       return json(
         { errors: parsed.error.flatten().fieldErrors },
@@ -57,7 +64,7 @@ export const action = async ({ request }: ActionArgs) => {
   }
 
   if (body.intent === 'remove') {
-    const parsed = z.object({ name: z.string() }).safeParse(body)
+    const parsed = schema.safeParse(body)
     if (!parsed.success) {
       return json(
         { errors: { __unscoped: 'Namespace name should be a string' } },
@@ -71,7 +78,7 @@ export const action = async ({ request }: ActionArgs) => {
   }
 
   if (body.intent === 'edit') {
-    const parsed = z.object({ name: z.string() }).safeParse(body)
+    const parsed = schema.safeParse(body)
     if (!parsed.success) {
       return json(
         { errors: { __unscoped: 'Namespace name should be a string' } },

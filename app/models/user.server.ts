@@ -1,4 +1,4 @@
-import { prisma } from '~/db.server'
+import { prisma } from '~/utils/db.server'
 import bcrypt from 'bcrypt'
 
 export async function login({ email, password }: LoginOptions) {
@@ -16,10 +16,7 @@ export async function login({ email, password }: LoginOptions) {
   }
   const isPasswordMatching = await bcrypt.compare(password, user.password.hash)
   if (isPasswordMatching) {
-    return {
-      id: user.id,
-      email: user.email,
-    }
+    return user.id
   }
   return null
 }
