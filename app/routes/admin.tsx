@@ -3,6 +3,12 @@ import { Link, NavLink, Outlet } from '@remix-run/react'
 import classNames from 'classnames'
 import { FiGlobe, FiServer, FiSettings } from 'react-icons/fi'
 import type { IconType } from 'react-icons'
+import { requireUserId } from '~/utils/session.server'
+import type { LoaderArgs } from '@remix-run/node'
+
+export const loader = ({ request }: LoaderArgs) => {
+  return requireUserId(request)
+}
 
 export default function AdminRoute() {
   return (

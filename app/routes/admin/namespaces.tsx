@@ -1,4 +1,4 @@
-import type { ActionArgs } from '@remix-run/node'
+import type { ActionArgs, LoaderArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import {
@@ -22,8 +22,11 @@ import { Float } from '@headlessui-float/react'
 import classNames from 'classnames'
 import { useEffect, useRef } from 'react'
 import invariant from 'tiny-invariant'
+import { requireUserId } from '~/utils/session.server'
 
 export const action = async ({ request }: ActionArgs) => {
+  await requireUserId(request)
+
   const formData = await request.formData()
   const body = Object.fromEntries(formData)
 
@@ -94,7 +97,9 @@ export const action = async ({ request }: ActionArgs) => {
   throw new Error('Invalid intent')
 }
 
-export const loader = async () => {
+export const loader = async ({ request }: LoaderArgs) => {
+  await requireUserId(request)
+
   const { namespaces } = await getNamespaces()
   const _namespaces = namespaces.map(namespace => {
     const formattedCreatedAt = format(

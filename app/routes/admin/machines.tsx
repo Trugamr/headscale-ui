@@ -1,4 +1,4 @@
-import type { ActionArgs } from '@remix-run/node'
+import type { ActionArgs, LoaderArgs } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import {
   Form,
@@ -18,8 +18,11 @@ import { z } from 'zod'
 import { ApiError } from '~/utils/client.server'
 import { getNamespaces } from '~/models/namespace.server'
 import Select from '~/components/select'
+import { requireUserId } from '~/utils/session.server'
 
 export const action = async ({ request }: ActionArgs) => {
+  await requireUserId(request)
+
   const formData = await request.formData()
   const body = Object.fromEntries(formData)
 
@@ -60,7 +63,9 @@ export const action = async ({ request }: ActionArgs) => {
   throw new Error('Invalid intent')
 }
 
-export const loader = async () => {
+export const loader = async ({ request }: LoaderArgs) => {
+  await requireUserId(request)
+
   const { namespaces } = await getNamespaces()
   const { machines } = await getMachines()
 

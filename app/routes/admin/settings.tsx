@@ -1,3 +1,10 @@
+import type { LoaderArgs } from '@remix-run/node'
+import { requireUserId } from '~/utils/session.server'
+
+export const loader = ({ request }: LoaderArgs) => {
+  return requireUserId(request)
+}
+
 export default function SettingsRoute() {
   return (
     <main>

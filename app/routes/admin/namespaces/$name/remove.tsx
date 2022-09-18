@@ -14,8 +14,10 @@ import invariant from 'tiny-invariant'
 import Button from '~/components/button'
 import { getNamespace, removeNamespace } from '~/models/namespace.server'
 import { ApiError } from '~/utils/client.server'
+import { requireUserId } from '~/utils/session.server'
 
 export const action = async ({ request, params }: ActionArgs) => {
+  await requireUserId(request)
   invariant(params.name, 'Namespace name not found in remove route')
 
   const formData = await request.formData()
@@ -52,8 +54,10 @@ export const action = async ({ request, params }: ActionArgs) => {
   throw new Error('Invalid intent')
 }
 
-export const loader = async ({ params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderArgs) => {
+  await requireUserId(request)
   invariant(params.name, 'Namespace name not found in remove route')
+
   const { namespace } = await getNamespace({ name: params.name })
   return json({ namespace })
 }

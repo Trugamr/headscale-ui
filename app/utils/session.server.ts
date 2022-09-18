@@ -1,6 +1,7 @@
 import type { User } from '@prisma/client'
 import { createCookieSessionStorage, redirect } from '@remix-run/node'
 import { getEnv } from '~/env.server'
+import { getUserById } from '~/models/user.server'
 
 const env = getEnv()
 
@@ -40,4 +41,37 @@ export async function createUserSession(
       'Set-Cookie': await storage.commitSession(session),
     },
   })
+}
+
+export async function requireUserId(
+  request: Request,
+  redirectTo: string = new URL(request.url).pathname,
+) {
+  const userId = await getUserId(request)
+  if (typeof userId !== 'string') {
+    const searchParams = new URLSearchParams([['redirectTo', redirectTo]])
+    throw redirect(`/login?${searchParams}`)
+  }
+  return userId
+}
+
+export async function logout(request: Request) {
+  const session = await getUserSession(request)
+  return redirect('/login', {
+    headers: {
+      'Set-Cookie': await storage.destroySession(session),
+    },
+  })
+}
+
+export async function getUser(request: Request) {
+  const userId = await getUserId(request)
+  if (typeof userId !== 'string') {
+    return null
+  }
+  try {
+    return getUserById(userId)
+  } catch {
+    throw logout(request)
+  }
 }

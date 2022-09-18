@@ -1,16 +1,24 @@
 import type { ActionArgs, LoaderArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { json } from '@remix-run/node'
-import { Form, useActionData } from '@remix-run/react'
+import { Form, useActionData, useSearchParams } from '@remix-run/react'
 import { z } from 'zod'
 import Button from '~/components/button'
 import Input from '~/components/input'
 import { login } from '~/models/user.server'
 import { createUserSession, getUserId } from '~/utils/session.server'
 
+function getRedirectUrl(value: FormDataEntryValue | null) {
+  if (typeof value === 'string') {
+    return value
+  }
+  return '/admin'
+}
+
 export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData()
   const body = Object.fromEntries(formData)
+  const redirectTo = getRedirectUrl(body.redirectTo)
 
   const schema = z.object({
     email: z.string().email('Email should be valid'),
@@ -33,7 +41,7 @@ export const action = async ({ request }: ActionArgs) => {
     )
   }
 
-  return createUserSession(userId, '/admin')
+  return createUserSession(userId, redirectTo)
 }
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -47,6 +55,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 export default function LoginRoute() {
   const actionData = useActionData<typeof action>()
   const errors = actionData?.errors ?? {}
+  const [searchParams] = useSearchParams()
 
   return (
     <main className="flex h-full flex-col">
@@ -63,6 +72,11 @@ export default function LoginRoute() {
           method="post"
           className="max-w-xs flex-grow rounded-md border border-gray-200 bg-gray-50 px-5 py-8"
         >
+          <input
+            type="hidden"
+            name="redirectTo"
+            value={searchParams.get('redirectTo') ?? undefined}
+          />
           <div className="flex flex-col gap-y-1">
             <label htmlFor="email">Email</label>
             <Input id="email" type="email" name="email" required />

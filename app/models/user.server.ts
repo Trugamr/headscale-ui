@@ -1,5 +1,6 @@
 import { prisma } from '~/utils/db.server'
 import bcrypt from 'bcrypt'
+import type { User } from '@prisma/client'
 
 export async function login({ email, password }: LoginOptions) {
   const user = await prisma.user.findUnique({
@@ -19,6 +20,12 @@ export async function login({ email, password }: LoginOptions) {
     return user.id
   }
   return null
+}
+
+export async function getUserById(id: User['id']) {
+  return prisma.user.findUnique({
+    where: { id },
+  })
 }
 
 // Types
