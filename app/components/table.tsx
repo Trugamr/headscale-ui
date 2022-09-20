@@ -5,6 +5,7 @@ import type {
   ReactNode,
 } from 'react'
 import classNames from 'classnames'
+import { FiHardDrive } from 'react-icons/fi'
 
 type TableColumn<Row> = Pick<ComponentProps<'th'>, 'className'> & {
   key: string
@@ -19,6 +20,7 @@ export type TableProps<Row> = Pick<
   columns: TableColumn<Row>[]
   rows: Row[]
   rowKey: (row: Row) => Key
+  emptyText?: string
 }
 
 export default function TableComponent<Row = unknown>({
@@ -26,6 +28,7 @@ export default function TableComponent<Row = unknown>({
   className,
   columns,
   rowKey,
+  emptyText = 'No data',
   ...rest
 }: TableProps<Row>) {
   return (
@@ -42,6 +45,18 @@ export default function TableComponent<Row = unknown>({
         </tr>
       </thead>
       <tbody>
+        {rows.length === 0 ? (
+          <tr className="rounded-md border border-gray-200 bg-gray-50">
+            <td colSpan={columns.length}>
+              <div className="flex items-center justify-center px-3 py-6">
+                <div className="flex flex-col items-center gap-y-1">
+                  <FiHardDrive className="text-4xl text-gray-400" />
+                  <p className="text-medium text-gray-400">{emptyText}</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+        ) : null}
         {rows.map(row => {
           return (
             <tr

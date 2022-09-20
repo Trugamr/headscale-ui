@@ -152,6 +152,7 @@ export default function MachinesRoute() {
         </header>
         <Table
           className="w-full text-sm"
+          emptyText="No namespaces"
           columns={[
             {
               key: 'name',

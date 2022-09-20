@@ -132,6 +132,7 @@ export default function MachinesRoute() {
         <Table
           className="w-full text-sm"
           rows={machines}
+          emptyText="No machines"
           columns={[
             {
               key: 'name',
