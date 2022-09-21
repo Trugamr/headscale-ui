@@ -2,18 +2,10 @@ import classNames from 'classnames'
 import type { ComponentProps, ForwardedRef } from 'react'
 import { forwardRef } from 'react'
 
-type OptionProps = ComponentProps<'option'>
-
-type SelectOption = Pick<OptionProps, 'value' | 'key'> & {
-  label: string
-}
-
-export type SelectProps = Omit<ComponentProps<'select'>, 'children'> & {
-  options: SelectOption[]
-}
+export type SelectProps = ComponentProps<'select'>
 
 function SelectComponent(
-  { className, options, ...rest }: SelectProps,
+  { className, children, ...rest }: SelectProps,
   ref: ForwardedRef<HTMLSelectElement>,
 ) {
   return (
@@ -25,18 +17,30 @@ function SelectComponent(
       {...rest}
       ref={ref}
     >
-      {options.map(item => {
-        return (
-          <option key={item.key} value={item.value} title={item.label}>
-            {item.label}
-          </option>
-        )
-      })}
+      {children}
     </select>
+  )
+}
+
+export type SelectOptionProps = ComponentProps<'option'>
+
+function SelectOptionComponent(
+  { children, ...rest }: SelectOptionProps,
+  ref: ForwardedRef<HTMLOptionElement>,
+) {
+  return (
+    <option {...rest} ref={ref}>
+      {children}
+    </option>
   )
 }
 
 const Select = forwardRef(SelectComponent)
 Select.displayName = 'Select'
 
-export default Select
+const SelectOption = forwardRef(SelectOptionComponent)
+SelectOption.displayName = 'SelectOption'
+
+export default Object.assign(Select, {
+  Option: SelectOption,
+})

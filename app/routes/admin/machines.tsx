@@ -188,15 +188,16 @@ export default function MachinesRoute() {
               <Select
                 name="namespace"
                 className="truncate text-ellipsis"
-                options={namespaces.map(namespace => {
-                  return {
-                    key: namespace.id,
-                    label: namespace.name,
-                    value: namespace.name,
-                  }
-                })}
                 required
-              />
+              >
+                {namespaces.map(namespace => {
+                  return (
+                    <Select.Option key={namespace.id} value={namespace.name}>
+                      {namespace.name}
+                    </Select.Option>
+                  )
+                })}
+              </Select>
               {'namespace' in errors ? (
                 <span className="text-sm text-red-500">{errors.namespace}</span>
               ) : null}
