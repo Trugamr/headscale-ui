@@ -190,6 +190,7 @@ export default function MachinesRoute() {
                 className="truncate text-ellipsis"
                 required
               >
+                <Select.Option value="">Select namespace</Select.Option>
                 {namespaces.map(namespace => {
                   return (
                     <Select.Option key={namespace.id} value={namespace.name}>
