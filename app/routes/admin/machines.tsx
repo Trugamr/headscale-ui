@@ -1,7 +1,9 @@
 import type { ActionArgs, LoaderArgs } from '@remix-run/node'
+import { redirect } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import {
   Form,
+  Outlet,
   useActionData,
   useLoaderData,
   useTransition,
@@ -9,6 +11,7 @@ import {
 import { format } from 'date-fns'
 import Button from '~/components/button'
 import Table from '~/components/table'
+import type { Machine } from '~/models/machine.server'
 import { getMachines, registerMachine } from '~/models/machine.server'
 import { FiMoreHorizontal } from 'react-icons/fi'
 import Input from '~/components/input'
@@ -19,6 +22,9 @@ import { ApiError } from '~/utils/client.server'
 import { getNamespaces } from '~/models/namespace.server'
 import Select from '~/components/select'
 import { requireUserId } from '~/utils/session.server'
+import { Menu } from '@headlessui/react'
+import { Float } from '@headlessui-float/react'
+import classNames from 'classnames'
 
 export const action = async ({ request }: ActionArgs) => {
   await requireUserId(request)
@@ -58,6 +64,18 @@ export const action = async ({ request }: ActionArgs) => {
         { status: 500 },
       )
     }
+  }
+
+  if (body.intent === 'remove') {
+    const parsed = z.object({ id: z.string() }).safeParse(body)
+    if (!parsed.success) {
+      return json(
+        { errors: { __unscoped: 'Machine id should be a string' } },
+        { status: 400 },
+      )
+    }
+    const id = parsed.data.id
+    return redirect(`/admin/machines/${id}/remove`)
   }
 
   throw new Error('Invalid intent')
@@ -163,12 +181,10 @@ export default function MachinesRoute() {
             },
             {
               key: 'action-menu',
-              title: <span className="sr-only">Namespaces action menu</span>,
-              render: row => (
-                <Button title={row.id} variant="ghost" size="sm">
-                  <FiMoreHorizontal className="text-lg" />
-                </Button>
-              ),
+              title: <span className="sr-only">Machine action menu</span>,
+              render: row => {
+                return <MachineMenu machine={row} />
+              },
             },
           ]}
           rowKey={row => row.id}
@@ -220,6 +236,54 @@ export default function MachinesRoute() {
           </Form>
         </div>
       </section>
+
+      <Outlet />
     </main>
+  )
+}
+
+// Components
+type MachineMenuProps = {
+  machine: Pick<Machine, 'id'>
+}
+
+function MachineMenu({ machine }: MachineMenuProps) {
+  const menuGroupClassName = 'flex flex-col'
+  const menuItemClassName =
+    'truncate text-ellipsis px-3 py-1.5 text-left ui-active:bg-gray-100 ui-disabled:text-gray-300'
+
+  return (
+    <Menu>
+      <Float
+        placement="left-start"
+        offset={8}
+        enter="transition-opacity duration-75"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+      >
+        <Menu.Button
+          as={Button}
+          variant="ghost"
+          icon={<FiMoreHorizontal className="text-lg" />}
+        />
+        <Menu.Items
+          as={Form}
+          method="post"
+          className="w-52 rounded-md border border-gray-200 bg-white py-1 text-base shadow-lg focus:outline-none"
+        >
+          <input name="id" defaultValue={machine.id} hidden />
+          <div className={menuGroupClassName}>
+            <Menu.Item
+              as="button"
+              className={classNames('text-danger-500', menuItemClassName)}
+              name="intent"
+              value="remove"
+            >
+              Remove machine
+            </Menu.Item>
+          </div>
+        </Menu.Items>
+      </Float>
+    </Menu>
   )
 }
