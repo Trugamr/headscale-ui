@@ -16,6 +16,12 @@ export function registerMachine(params: RegisterMachineOptions) {
     .json<{ machine: Machine }>()
 }
 
+export function renameMachine(options: RenameMachineOptions) {
+  return client
+    .post(`v1/machine/${options.id}/rename/${options.name}`)
+    .json<{ machine: Machine }>()
+}
+
 export function removeMachine(options: RemoveMachineOptions) {
   return client.delete(`v1/machine/${options.id}`).json<{}>()
 }
@@ -48,6 +54,11 @@ type GetMachineOptions = {
 type RegisterMachineOptions = {
   namespace: string
   key: string
+}
+
+type RenameMachineOptions = {
+  id: string
+  name: string
 }
 
 type RemoveMachineOptions = {

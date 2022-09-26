@@ -66,6 +66,17 @@ export const action = async ({ request }: ActionArgs) => {
     }
   }
 
+  if (body.intent === 'edit_name') {
+    const parsed = z.object({ id: z.string() }).safeParse(body)
+    if (!parsed.success) {
+      return json(
+        { errors: { __unscoped: 'Machine id should be a string' } },
+        { status: 400 },
+      )
+    }
+    return redirect(`/admin/machines/${parsed.data.id}/name/edit`)
+  }
+
   if (body.intent === 'remove') {
     const parsed = z.object({ id: z.string() }).safeParse(body)
     if (!parsed.success) {
@@ -272,6 +283,17 @@ function MachineMenu({ machine }: MachineMenuProps) {
           className="w-52 rounded-md border border-gray-200 bg-white py-1 text-base shadow-lg focus:outline-none"
         >
           <input name="id" defaultValue={machine.id} hidden />
+          <div className={menuGroupClassName}>
+            <Menu.Item
+              as="button"
+              name="intent"
+              value="edit_name"
+              className={menuItemClassName}
+            >
+              Edit machine name
+            </Menu.Item>
+          </div>
+          <hr className="my-1 border-gray-200" />
           <div className={menuGroupClassName}>
             <Menu.Item
               as="button"
