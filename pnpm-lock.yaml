@@ -17,6 +17,9 @@ dependencies:
   '@prisma/client':
     specifier: ^4.16.1
     version: 4.16.1(prisma@4.16.1)
+  '@remix-run/css-bundle':
+    specifier: ^1.17.1
+    version: 1.17.1
   '@remix-run/node':
     specifier: ^1.17.1
     version: 1.17.1
@@ -35,6 +38,9 @@ dependencies:
   date-fns:
     specifier: ^2.30.0
     version: 2.30.0
+  isbot:
+    specifier: latest
+    version: 3.6.12
   ky:
     specifier: ^0.33.3
     version: 0.33.3
@@ -1917,6 +1923,10 @@ packages:
   /@prisma/engines@4.16.1:
     resolution: {integrity: sha512-gpZG0kGGxfemgvK/LghHdBIz+crHkZjzszja94xp4oytpsXrgt/Ice82MvPsWMleVIniKuARrowtsIsim0PFJQ==}
     requiresBuild: true
+
+  /@remix-run/css-bundle@1.17.1:
+    resolution: {integrity: sha512-++aULPl14ba0prI8pF5tA607CvOuRy8a9oFtfoD+WvxcEQoE8ZE6qeBGsk4Cs8p9y7fYYag0aNG+TQILHhJ0Xw==}
+    dev: false
 
   /@remix-run/dev@1.17.1(@remix-run/serve@1.17.1)(@types/node@20.3.1)(ts-node@10.9.1):
     resolution: {integrity: sha512-HW6y9Ki3+3LsrqhGngHwK3CSZ91Zcfrp8JNIMQQBq083+PprStsoyEenZye3rFacjeBMjDzhfRfFn2QFuDcVhg==}
@@ -5098,6 +5108,11 @@ packages:
   /isarray@2.0.5:
     resolution: {integrity: sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==}
     dev: true
+
+  /isbot@3.6.12:
+    resolution: {integrity: sha512-dGc3jRIORywaaqs4G5wj+58i5/l1eoI75q7XNiyW9Sgfoyr3QkyDZUXw+cuB7AOFq/0aruCQrGLrnKJlQarP/g==}
+    engines: {node: '>=12'}
+    dev: false
 
   /isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}

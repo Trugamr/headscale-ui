@@ -1,4 +1,9 @@
-import type { LinksFunction, MetaFunction } from '@remix-run/node'
+import { cssBundleHref } from '@remix-run/css-bundle'
+import type {
+  LinkDescriptor,
+  LinksFunction,
+  MetaFunction,
+} from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -16,7 +21,7 @@ export const meta: MetaFunction = () => ({
 })
 
 export const links: LinksFunction = () => {
-  return [
+  const descriptors: LinkDescriptor[] = [
     {
       rel: 'preload',
       as: 'font',
@@ -50,6 +55,12 @@ export const links: LinksFunction = () => {
       href: styles,
     },
   ]
+
+  if (cssBundleHref) {
+    descriptors.push({ rel: 'stylesheet', href: cssBundleHref })
+  }
+
+  return descriptors
 }
 
 export default function App() {

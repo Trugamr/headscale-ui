@@ -45,7 +45,11 @@ function ButtonComponent(
   return (
     <button className={classNames(classes, className)} {...rest} ref={ref}>
       {icon}
-      {typeof children === 'string' ? <span>{children}</span> : children}
+      {typeof children === 'string' ? (
+        <span className="flex-grow">{children}</span>
+      ) : (
+        children
+      )}
     </button>
   )
 }
