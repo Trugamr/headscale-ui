@@ -2,4 +2,5 @@
 module.exports = {
   ignoredRouteFiles: ['**/.*'],
   serverDependenciesToBundle: ['ky'],
+  tailwind: true,
 }
