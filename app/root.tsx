@@ -1,9 +1,5 @@
 import { cssBundleHref } from '@remix-run/css-bundle'
-import type {
-  LinkDescriptor,
-  LinksFunction,
-  MetaFunction,
-} from '@remix-run/node'
+import type { LinkDescriptor, LinksFunction } from '@remix-run/node'
 import {
   Links,
   LiveReload,
@@ -14,11 +10,13 @@ import {
 } from '@remix-run/react'
 import styles from '~/styles/app.css'
 
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'Headscale',
-  viewport: 'width=device-width,initial-scale=1',
-})
+export const meta = () => {
+  return [
+    { charset: 'utf-8' },
+    { title: 'Headscale' },
+    { viewport: 'width=device-width,initial-scale=1' },
+  ]
+}
 
 export const links: LinksFunction = () => {
   const descriptors: LinkDescriptor[] = [
