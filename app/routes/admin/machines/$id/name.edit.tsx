@@ -14,7 +14,7 @@ import invariant from 'tiny-invariant'
 import { z } from 'zod'
 import Button from '~/components/button'
 import Input from '~/components/input'
-import { getMachine, renameMachine } from '~/models/machine.server'
+import { getMachine, renameMachine } from '~/models/headscale/machine.server'
 import { ApiError } from '~/utils/client.server'
 import { requireUserId } from '~/utils/session.server'
 
@@ -71,7 +71,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   return json({ machine })
 }
 
-export default function RemoveNamespaceRoute() {
+export default function RemoveUserRoute() {
   const { machine } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const errors = actionData?.errors ?? { __unscoped: undefined }
@@ -123,12 +123,12 @@ export default function RemoveNamespaceRoute() {
 
             <Form method="post" replace>
               <div className="mt-6 flex flex-col">
-                <label htmlFor="namespace-name" className="mb-2 max-w-max">
+                <label htmlFor="machine-name" className="mb-2 max-w-max">
                   Machine name
                 </label>
                 <Input
                   ref={nameInputRef}
-                  id="namespace-name"
+                  id="machine-name"
                   type="text"
                   name="name"
                   defaultValue={machine.givenName}

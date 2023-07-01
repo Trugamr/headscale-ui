@@ -1,5 +1,5 @@
 import { client } from '~/utils/client.server'
-import type { Namespace } from './namespace.server'
+import type { User } from './user.server'
 
 // Routes
 export function getMachine(options: GetMachineOptions) {
@@ -34,7 +34,7 @@ export type Machine = {
   discoKey: string
   ipAddresses: ['fd7a:115c:a1e0::1', '100.64.0.1']
   name: string
-  namespace: Namespace
+  user: User
   lastSeen: string
   lastSuccessfulUpdate: string
   expiry: string
@@ -52,7 +52,7 @@ type GetMachineOptions = {
 }
 
 type RegisterMachineOptions = {
-  namespace: string
+  user: string
   key: string
 }
 

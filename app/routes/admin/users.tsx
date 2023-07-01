@@ -11,8 +11,8 @@ import {
 import { format } from 'date-fns'
 import { z } from 'zod'
 import Input from '~/components/input'
-import type { Namespace } from '~/models/namespace.server'
-import { createNamespace, getNamespaces } from '~/models/namespace.server'
+import type { User } from '~/models/headscale/user.server'
+import { createUser, getUsers } from '~/models/headscale/user.server'
 import { ApiError } from '~/utils/client.server'
 import { FiMoreHorizontal } from 'react-icons/fi'
 import Button from '~/components/button'
@@ -31,10 +31,7 @@ export const action = async ({ request }: ActionArgs) => {
   const body = Object.fromEntries(formData)
 
   const schema = z.object({
-    name: z
-      .string()
-      .min(1)
-      .max(63, 'Namespace name should not exceed 63 characters'),
+    name: z.string().min(1).max(63, 'Username should not exceed 63 characters'),
   })
 
   if (body.intent === 'create') {
@@ -46,8 +43,8 @@ export const action = async ({ request }: ActionArgs) => {
       )
     }
     try {
-      const { namespace } = await createNamespace({ name: parsed.data.name })
-      return json({ namespace, errors: null })
+      const { user } = await createUser({ name: parsed.data.name })
+      return json({ user, errors: null })
     } catch (error) {
       if (error instanceof ApiError) {
         return json(
@@ -58,7 +55,7 @@ export const action = async ({ request }: ActionArgs) => {
       return json(
         {
           errors: {
-            __unscoped: 'Something went wrong while creating namespace',
+            __unscoped: 'Something went wrong while creating userYs',
           },
         },
         { status: 500 },
@@ -70,28 +67,28 @@ export const action = async ({ request }: ActionArgs) => {
     const parsed = schema.safeParse(body)
     if (!parsed.success) {
       return json(
-        { errors: { __unscoped: 'Namespace name should be a string' } },
+        { errors: { __unscoped: 'Username should be a string' } },
         { status: 400 },
       )
     }
-    // Namespace name can be empty string so we redirect with a space
-    // Using which api correctly returns the namespace with empty string
+    // Username can be empty string so we redirect with a space
+    // Using which api correctly returns the user with empty string
     const name = parsed.data.name
-    return redirect(`/admin/namespaces/${name}/remove`)
+    return redirect(`/admin/users/${name}/remove`)
   }
 
   if (body.intent === 'edit') {
     const parsed = schema.safeParse(body)
     if (!parsed.success) {
       return json(
-        { errors: { __unscoped: 'Namespace name should be a string' } },
+        { errors: { __unscoped: 'Username should be a string' } },
         { status: 400 },
       )
     }
-    // Namespace name can be empty string so we redirect with a space
-    // Using which api correctly returns the namespace with empty string
+    // Username can be empty string so we redirect with a space
+    // Using which api correctly returns the user with empty string
     const name = parsed.data.name === '' ? ' ' : parsed.data.name
-    return redirect(`/admin/namespaces/${name}/edit`)
+    return redirect(`/admin/users/${name}/edit`)
   }
 
   throw new Error('Invalid intent')
@@ -100,24 +97,24 @@ export const action = async ({ request }: ActionArgs) => {
 export const loader = async ({ request }: LoaderArgs) => {
   await requireUserId(request)
 
-  const { namespaces } = await getNamespaces()
-  const _namespaces = namespaces.map(namespace => {
+  const { users } = await getUsers()
+  const _users = users.map(users => {
     const formattedCreatedAt = format(
-      new Date(namespace.createdAt),
+      new Date(users.createdAt),
       'LLL M yyyy, hh:mm a',
     )
 
     return {
-      id: namespace.id,
-      name: namespace.name,
+      id: users.id,
+      name: users.name,
       formattedCreatedAt,
     }
   })
-  return json({ namespaces: _namespaces })
+  return json({ users: _users })
 }
 
 export default function MachinesRoute() {
-  const { namespaces } = useLoaderData<typeof loader>()
+  const { users } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const errors = actionData?.errors ?? {}
 
@@ -148,11 +145,11 @@ export default function MachinesRoute() {
       ) : null}
       <section>
         <header className="mb-8">
-          <h3 className="text-3xl font-semibold">Namespaces</h3>
+          <h3 className="text-3xl font-semibold">Users</h3>
         </header>
         <Table
           className="w-full text-sm"
-          emptyText="No namespaces"
+          emptyText="No users"
           columns={[
             {
               key: 'name',
@@ -166,19 +163,19 @@ export default function MachinesRoute() {
             },
             {
               key: 'action-menu',
-              title: <span className="sr-only">Namespaces action menu</span>,
+              title: <span className="sr-only">Users action menu</span>,
               render: row => {
-                return <NamespaceMenu namespace={row} />
+                return <UserMenu user={row} />
               },
             },
           ]}
-          rows={namespaces}
+          rows={users}
           rowKey={row => row.id}
         />
       </section>
       <section className="mt-8">
         <header>
-          <h4 className="text-xl font-semibold">Create Namespace</h4>
+          <h4 className="text-xl font-semibold">Create User</h4>
         </header>
         <div className="mt-2 flex flex-col gap-y-1">
           <Form className="flex gap-x-2" method="post" ref={createFormRef}>
@@ -205,11 +202,11 @@ export default function MachinesRoute() {
 }
 
 // Components
-type NamespaceMenuProps = {
-  namespace: Pick<Namespace, 'name'>
+type UserMenuProps = {
+  user: Pick<User, 'name'>
 }
 
-function NamespaceMenu({ namespace }: NamespaceMenuProps) {
+function UserMenu({ user }: UserMenuProps) {
   const menuGroupClassName = 'flex flex-col'
   const menuItemClassName =
     'truncate text-ellipsis px-3 py-1.5 text-left ui-active:bg-gray-100 ui-disabled:text-gray-300'
@@ -233,7 +230,7 @@ function NamespaceMenu({ namespace }: NamespaceMenuProps) {
           method="post"
           className="w-52 rounded-md border border-gray-200 bg-white py-1 text-base shadow-lg focus:outline-none"
         >
-          <input name="name" defaultValue={namespace.name} hidden />
+          <input name="name" defaultValue={user.name} hidden />
           <div className={menuGroupClassName}>
             <Menu.Item
               as="button"
@@ -241,7 +238,7 @@ function NamespaceMenu({ namespace }: NamespaceMenuProps) {
               value="edit"
               className={menuItemClassName}
             >
-              Edit namespace
+              Edit user
             </Menu.Item>
           </div>
           <hr className="my-1 border-gray-200" />
@@ -252,7 +249,7 @@ function NamespaceMenu({ namespace }: NamespaceMenuProps) {
               name="intent"
               value="remove"
             >
-              Remove namepsace
+              Remove user
             </Menu.Item>
           </div>
         </Menu.Items>

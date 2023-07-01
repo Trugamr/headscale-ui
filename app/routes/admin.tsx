@@ -1,7 +1,7 @@
 import type { NavLinkProps } from '@remix-run/react'
 import { Link, NavLink, Outlet } from '@remix-run/react'
 import classNames from 'classnames'
-import { FiGlobe, FiServer, FiSettings } from 'react-icons/fi'
+import { FiServer, FiSettings, FiUsers } from 'react-icons/fi'
 import type { IconType } from 'react-icons'
 import { requireUserId } from '~/utils/session.server'
 import type { LoaderArgs } from '@remix-run/node'
@@ -23,11 +23,11 @@ export default function AdminRoute() {
             </header>
           </div>
           <nav className="flex gap-x-2.5 md:gap-x-4">
-            <StyledNavLink to="namespaces" icon={FiGlobe}>
-              Namespaces
-            </StyledNavLink>
             <StyledNavLink to="machines" icon={FiServer}>
               Machines
+            </StyledNavLink>
+            <StyledNavLink to="users" icon={FiUsers}>
+              Users
             </StyledNavLink>
             <StyledNavLink to="settings" icon={FiSettings}>
               Settings

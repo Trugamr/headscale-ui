@@ -12,27 +12,27 @@ import { useRef } from 'react'
 import { FiX } from 'react-icons/fi'
 import invariant from 'tiny-invariant'
 import Button from '~/components/button'
-import { getNamespace, removeNamespace } from '~/models/namespace.server'
+import { getUser, removeUser } from '~/models/headscale/user.server'
 import { ApiError } from '~/utils/client.server'
 import { requireUserId } from '~/utils/session.server'
 
 export const action = async ({ request, params }: ActionArgs) => {
   await requireUserId(request)
-  invariant(params.name, 'Namespace name not found in remove route')
+  invariant(params.name, 'Username not found in remove route')
 
   const formData = await request.formData()
   const body = Object.fromEntries(formData)
 
-  const namespacesRoute = '/admin/namespaces'
+  const userssRoute = '/admin/users'
 
   if (body.intent === 'cancel') {
-    return redirect(namespacesRoute)
+    return redirect(userssRoute)
   }
 
   if (body.intent === 'remove_confirm') {
     try {
-      await removeNamespace({ name: params.name })
-      return redirect(namespacesRoute)
+      await removeUser({ name: params.name })
+      return redirect(userssRoute)
     } catch (error) {
       if (error instanceof ApiError) {
         return json(
@@ -43,7 +43,7 @@ export const action = async ({ request, params }: ActionArgs) => {
       return json(
         {
           errors: {
-            __unscoped: 'Something went wrong while removing namespace',
+            __unscoped: 'Something went wrong while removing user',
           },
         },
         { status: 500 },
@@ -56,14 +56,14 @@ export const action = async ({ request, params }: ActionArgs) => {
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   await requireUserId(request)
-  invariant(params.name, 'Namespace name not found in remove route')
+  invariant(params.name, 'Username not found in remove route')
 
-  const { namespace } = await getNamespace({ name: params.name })
-  return json({ namespace })
+  const { user } = await getUser({ name: params.name })
+  return json({ user })
 }
 
-export default function RemoveNamespaceRoute() {
-  const { namespace } = useLoaderData<typeof loader>()
+export default function RemoveUserRoute() {
+  const { user } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const errors = actionData?.errors ?? { __unscoped: undefined }
   const removeButtonRef = useRef<HTMLButtonElement>(null)
@@ -92,7 +92,7 @@ export default function RemoveNamespaceRoute() {
                 as="h3"
                 className="align-middle text-lg font-medium leading-6 text-gray-900"
               >
-                Remove {namespace.name}
+                Remove {user.name}
               </Dialog.Title>
               <Button
                 name="intent"
@@ -110,7 +110,7 @@ export default function RemoveNamespaceRoute() {
 
             <div className="mt-4">
               <p className="text-sm text-gray-700">
-                This namespace will permanently be removed.
+                This user will permanently be removed.
               </p>
             </div>
 
@@ -125,7 +125,7 @@ export default function RemoveNamespaceRoute() {
                 variant="primary"
                 danger
               >
-                Remove <span className="hidden sm:inline">namespace</span>
+                Remove <span className="hidden sm:inline">user</span>
               </Button>
             </div>
           </Dialog.Panel>

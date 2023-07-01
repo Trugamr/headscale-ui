@@ -4,5 +4,5 @@ import { requireUserId } from '~/utils/session.server'
 
 export const loader = async ({ request }: LoaderArgs) => {
   await requireUserId(request)
-  return redirect('/admin/namespaces')
+  return redirect('/admin/machines')
 }

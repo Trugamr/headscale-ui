@@ -12,7 +12,7 @@ import { useRef } from 'react'
 import { FiX } from 'react-icons/fi'
 import invariant from 'tiny-invariant'
 import Button from '~/components/button'
-import { getMachine, removeMachine } from '~/models/machine.server'
+import { getMachine, removeMachine } from '~/models/headscale/machine.server'
 import { ApiError } from '~/utils/client.server'
 import { requireUserId } from '~/utils/session.server'
 
