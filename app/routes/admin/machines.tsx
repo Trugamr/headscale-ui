@@ -11,15 +11,15 @@ import {
 import { format } from 'date-fns'
 import Button from '~/components/button'
 import Table from '~/components/table'
-import type { Machine } from '~/models/machine.server'
-import { getMachines, registerMachine } from '~/models/machine.server'
+import type { Machine } from '~/models/headscale/machine.server'
+import { getMachines, registerMachine } from '~/models/headscale/machine.server'
 import { FiMoreHorizontal } from 'react-icons/fi'
 import Input from '~/components/input'
 import { useEffect, useRef } from 'react'
 import invariant from 'tiny-invariant'
 import { z } from 'zod'
 import { ApiError } from '~/utils/client.server'
-import { getNamespaces } from '~/models/namespace.server'
+import { getUsers } from '~/models/headscale/user.server'
 import Select from '~/components/select'
 import { requireUserId } from '~/utils/session.server'
 import { Menu } from '@headlessui/react'
@@ -34,7 +34,7 @@ export const action = async ({ request }: ActionArgs) => {
 
   if (body.intent === 'register') {
     const parsed = z
-      .object({ namespace: z.string().min(1).max(63), key: z.string() })
+      .object({ user: z.string().min(1).max(63), key: z.string() })
       .safeParse(body)
     if (!parsed.success) {
       return json(
@@ -44,7 +44,7 @@ export const action = async ({ request }: ActionArgs) => {
     }
     try {
       const { machine } = await registerMachine({
-        namespace: parsed.data.namespace,
+        user: parsed.data.user,
         key: parsed.data.key,
       })
       return json({ machine, errors: null })
@@ -95,13 +95,13 @@ export const action = async ({ request }: ActionArgs) => {
 export const loader = async ({ request }: LoaderArgs) => {
   await requireUserId(request)
 
-  const { namespaces } = await getNamespaces()
+  const { users } = await getUsers()
   const { machines } = await getMachines()
 
-  const _namespaces = namespaces.map(namespace => {
+  const _users = users.map(user => {
     return {
-      id: namespace.id,
-      name: namespace.name,
+      id: user.id,
+      name: user.name,
     }
   })
 
@@ -116,17 +116,17 @@ export const loader = async ({ request }: LoaderArgs) => {
       givenName: machine.givenName,
       ipAddresses: machine.ipAddresses,
       formattedLastSeen,
-      namespace: {
-        name: machine.namespace.name,
+      user: {
+        name: machine.user.name,
       },
     }
   })
 
-  return json({ machines: _machines, namespaces: _namespaces })
+  return json({ machines: _machines, users: _users })
 }
 
 export default function MachinesRoute() {
-  const { machines, namespaces } = useLoaderData<typeof loader>()
+  const { machines, users } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const errors = actionData?.errors ?? {}
 
@@ -169,7 +169,7 @@ export default function MachinesRoute() {
               render: row => (
                 <div className="flex flex-col">
                   <span className="font-medium">{row.givenName}</span>
-                  <span>{row.namespace.name}</span>
+                  <span>{row.user.name}</span>
                 </div>
               ),
             },
@@ -212,22 +212,18 @@ export default function MachinesRoute() {
             ref={registerFormRef}
           >
             <div className="flex flex-grow flex-col gap-y-1">
-              <Select
-                name="namespace"
-                className="truncate text-ellipsis"
-                required
-              >
-                <Select.Option value="">Select namespace</Select.Option>
-                {namespaces.map(namespace => {
+              <Select name="user" className="truncate text-ellipsis" required>
+                <Select.Option value="">Select user</Select.Option>
+                {users.map(user => {
                   return (
-                    <Select.Option key={namespace.id} value={namespace.name}>
-                      {namespace.name}
+                    <Select.Option key={user.id} value={user.name}>
+                      {user.name}
                     </Select.Option>
                   )
                 })}
               </Select>
-              {'namespace' in errors ? (
-                <span className="text-sm text-red-500">{errors.namespace}</span>
+              {'user' in errors ? (
+                <span className="text-sm text-red-500">{errors.user}</span>
               ) : null}
             </div>
             <div className="flex flex-grow-[2] flex-col gap-y-1">

@@ -14,37 +14,37 @@ import invariant from 'tiny-invariant'
 import { z } from 'zod'
 import Button from '~/components/button'
 import Input from '~/components/input'
-import { getNamespace, renameNamespace } from '~/models/namespace.server'
+import { getUser, renameUser } from '~/models/headscale/user.server'
 import { ApiError } from '~/utils/client.server'
 import { requireUserId } from '~/utils/session.server'
 
 export const action = async ({ request, params }: ActionArgs) => {
   await requireUserId(request)
-  invariant(params.name, 'Namespace name not found in remove route')
+  invariant(params.name, 'Username not found in remove route')
 
   const formData = await request.formData()
   const body = Object.fromEntries(formData)
 
-  const namespacesRoute = '/admin/namespaces'
+  const usersRoute = '/admin/users'
 
   if (body.intent === 'cancel') {
-    return redirect(namespacesRoute)
+    return redirect(usersRoute)
   }
 
   if (body.intent === 'update_name') {
     const parsed = z.object({ name: z.string() }).safeParse(body)
     if (!parsed.success) {
       return json(
-        { errors: { __unscoped: 'Namespace name should be a string' } },
+        { errors: { __unscoped: 'Username should be a string' } },
         { status: 400 },
       )
     }
     try {
-      await renameNamespace({
+      await renameUser({
         before: params.name,
         after: parsed.data.name,
       })
-      return redirect(namespacesRoute)
+      return redirect(usersRoute)
     } catch (error) {
       if (error instanceof ApiError) {
         return json(
@@ -55,7 +55,7 @@ export const action = async ({ request, params }: ActionArgs) => {
       return json(
         {
           errors: {
-            __unscoped: 'Something went wrong while updating namespace',
+            __unscoped: 'Something went wrong while updating user',
           },
         },
         { status: 500 },
@@ -68,14 +68,14 @@ export const action = async ({ request, params }: ActionArgs) => {
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   await requireUserId(request)
-  invariant(params.name, 'Namespace name not found in remove route')
+  invariant(params.name, 'Username not found in remove route')
 
-  const { namespace } = await getNamespace({ name: params.name })
-  return json({ namespace })
+  const { user } = await getUser({ name: params.name })
+  return json({ user })
 }
 
-export default function RemoveNamespaceRoute() {
-  const { namespace } = useLoaderData<typeof loader>()
+export default function RemoveUserRoute() {
+  const { user } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const errors = actionData?.errors ?? { __unscoped: undefined }
   const nameInputRef = useRef<HTMLInputElement>(null)
@@ -100,7 +100,7 @@ export default function RemoveNamespaceRoute() {
                 as="h3"
                 className="align-middle text-lg font-medium leading-6 text-gray-900"
               >
-                Edit namespace name for {namespace.name}
+                Edit username for {user.name}
               </Dialog.Title>
               <Form method="post" replace>
                 <Button
@@ -120,21 +120,21 @@ export default function RemoveNamespaceRoute() {
 
             <div className="mt-4">
               <p className="text-sm text-gray-700">
-                This namespace name will be shown in admin panel.
+                This username will be shown in admin panel.
               </p>
             </div>
 
             <Form method="post" replace>
               <div className="mt-6 flex flex-col">
-                <label htmlFor="namespace-name" className="mb-2 max-w-max">
-                  Namespace name
+                <label htmlFor="username" className="mb-2 max-w-max">
+                  Username
                 </label>
                 <Input
                   ref={nameInputRef}
-                  id="namespace-name"
+                  id="username"
                   type="text"
                   name="name"
-                  defaultValue={namespace.name}
+                  defaultValue={user.name}
                 />
               </div>
 
